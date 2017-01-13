@@ -20,7 +20,7 @@
 #import "NIPreprocessorMacros.h" /* for weak */
 
 @protocol NICollectionViewModelDelegate;
-
+@class NICellObject;
 
 #pragma mark Sectioned Array Objects
 
@@ -41,7 +41,7 @@
  *
  * @ingroup CollectionViewModels
  */
-@interface NICollectionViewModel : NSObject <UICollectionViewDataSource>
+@interface NICollectionViewModel : NSObject <UICollectionViewDataSource, UICollectionViewDataSourcePrefetching>
 
 #pragma mark Creating Collection View Models
 
@@ -94,6 +94,11 @@
                                    collectionView:(UICollectionView *)collectionView
                 viewForSupplementaryElementOfKind:(NSString *)kind
                                       atIndexPath:(NSIndexPath *)indexPath;
+
+- (void)collectionViewModel:(NICollectionViewModel *)collectionViewModel
+  prefetchDataForCellObject:(NICellObject *)cellObject;
+
+- (void)collectionViewModel:(NICollectionViewModel *)collectionViewModel cancelPrefetcingForCellObject:(NICellObject *)cellObject;
 
 @end
 

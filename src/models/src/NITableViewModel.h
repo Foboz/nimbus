@@ -19,8 +19,12 @@
 
 #import "NIPreprocessorMacros.h" /* for weak */
 
+@class NICellObject;
+
 #if NS_BLOCKS_AVAILABLE
 typedef UITableViewCell* (^NITableViewModelCellForIndexPathBlock)(UITableView* tableView, NSIndexPath* indexPath, id object);
+
+typedef void (^NITableViewModelPrefetchObjectBlock) (NICellObject *cellObject);
 #endif // #if NS_BLOCKS_AVAILABLE
 
 @protocol NITableViewModelDelegate;
@@ -48,7 +52,7 @@ typedef enum {
  *
  * @ingroup TableViewModels
  */
-@interface NITableViewModel : NSObject <UITableViewDataSource>
+@interface NITableViewModel : NSObject <UITableViewDataSource, UITableViewDataSourcePrefetching>
 
 #pragma mark Creating Table View Models
 
@@ -86,6 +90,14 @@ typedef enum {
 // If both the delegate and this block are provided, cells returned by this block will be used
 // and the delegate will not be called.
 @property (nonatomic, copy) NITableViewModelCellForIndexPathBlock createCellBlock;
+
+
+// If both the delegate and the block for prefetch methods are provided, only the block will be executed
+// Block will be called for each table view model in prefetchRowsAtIndexPaths: method
+@property (nonatomic, copy) NITableViewModelPrefetchObjectBlock prefetchObjectBlock;
+
+// Block will be called for each table view model in cancelPrefetchingForRowsAtIndexPaths: method
+@property (nonatomic, copy) NITableViewModelPrefetchObjectBlock cancelPrefetchingBlock;
 #endif // #if NS_BLOCKS_AVAILABLE
 
 @end
@@ -108,6 +120,12 @@ typedef enum {
                    cellForTableView: (UITableView *)tableView
                         atIndexPath: (NSIndexPath *)indexPath
                          withObject: (id)object;
+
+@optional
+
+- (void)tableViewModel:(NITableViewModel *)tableViewModel prefetchDataForCellObject: (NICellObject *)cellObject;
+
+- (void)tableViewModel:(NITableViewModel *)tableViewModel cancelPrefetchingForCellObject:(NICellObject *)cellObject;
 
 @end
 
