@@ -307,6 +307,62 @@
   return cell;
 }
 
+#pragma mark - UITableViewDataSourcePrefetching
+
+- (void)tableView:(UITableView *)tableView prefetchRowsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
+
+#if NS_BLOCKS_AVAILABLE
+  if (nil != self.prefetchObjectBlock) {
+    for (NSIndexPath *indexPath in indexPaths) {
+      NICellObject *cellObject = [self objectAtIndexPath:indexPath];
+      if (nil == cellObject) {
+        continue;
+      }
+      self.prefetchObjectBlock(cellObject);
+    }
+
+    return;
+  }
+#endif
+
+  if ([self.delegate respondsToSelector:@selector(tableViewModel:prefetchDataForCellObject:)]) {
+    for (NSIndexPath *indexPath in indexPaths) {
+      NICellObject *cellObject = [self objectAtIndexPath:indexPath];
+      if (nil == cellObject) {
+        continue;
+      }
+      [self.delegate tableViewModel:self
+          prefetchDataForCellObject:cellObject];
+    }
+  }
+}
+
+- (void)tableView:(UITableView *)tableView cancelPrefetchingForRowsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
+#if NS_BLOCKS_AVAILABLE
+  if (nil != self.cancelPrefetchingBlock) {
+    for (NSIndexPath *indexPath in indexPaths) {
+      NICellObject *cellObject = [self objectAtIndexPath:indexPath];
+      if (nil == cellObject) {
+        continue;
+      }
+      self.cancelPrefetchingBlock(cellObject);
+    }
+
+    return;
+  }
+#endif
+
+  if ([self.delegate respondsToSelector:@selector(tableViewModel:cancelPrefetchingForCellObject:)]) {
+    for (NSIndexPath *indexPath in indexPaths) {
+      NICellObject *cellObject = [self objectAtIndexPath:indexPath];
+      if (nil == cellObject) {
+        continue;
+      }
+      [self.delegate tableViewModel:self cancelPrefetchingForCellObject:cellObject];
+    }
+  }
+}
+
 #pragma mark - Public
 
 
@@ -349,6 +405,24 @@
   }
 
   return nil;
+}
+
+- (NSIndexPath *)indexPathForObjectIdenticalTo:(id)object {
+    if (nil == object) {
+        return nil;
+    }
+
+    NSArray *sections = self.sections;
+    for (NSUInteger sectionIndex = 0; sectionIndex < [sections count]; sectionIndex++) {
+        NSArray* rows = [[sections objectAtIndex:sectionIndex] rows];
+        for (NSUInteger rowIndex = 0; rowIndex < [rows count]; rowIndex++) {
+            if (object == [rows objectAtIndex:rowIndex]) {
+                return [NSIndexPath indexPathForRow:rowIndex inSection:sectionIndex];
+            }
+        }
+    }
+    
+    return nil;
 }
 
 - (void)setSectionIndexType:(NITableViewModelSectionIndex)sectionIndexType showsSearch:(BOOL)showsSearch showsSummary:(BOOL)showsSummary {

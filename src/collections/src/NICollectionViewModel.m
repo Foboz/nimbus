@@ -172,6 +172,34 @@
   return nil;
 }
 
+#pragma mark - UICollectionViewDataSourcePrefetching
+
+- (void)collectionView:(UICollectionView *)collectionView prefetchItemsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
+  if (![self.delegate respondsToSelector:@selector(collectionView:prefetchItemsAtIndexPaths:)]) {
+    return;
+  }
+
+  for (NSIndexPath *indexPath in indexPaths) {
+    NICellObject *cellObject = [self objectAtIndexPath:indexPath];
+    if (nil != cellObject) {
+      [self.delegate collectionViewModel:self prefetchDataForCellObject:cellObject];
+    }
+  }
+}
+
+- (void)collectionView:(UICollectionView *)collectionView cancelPrefetchingForItemsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths {
+  if (![self.delegate respondsToSelector:@selector(collectionView:cancelPrefetchingForItemsAtIndexPaths:)]) {
+    return;
+  }
+
+  for (NSIndexPath *indexPath in indexPaths) {
+    NICellObject *cellObject = [self objectAtIndexPath:indexPath];
+    if (nil != cellObject) {
+      [self.delegate collectionViewModel:self cancelPrefetcingForCellObject:cellObject];
+    }
+  }
+}
+
 #pragma mark - Public
 
 
