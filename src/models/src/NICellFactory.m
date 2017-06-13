@@ -188,7 +188,7 @@
   if ([cellClass respondsToSelector:@selector(heightForObject:atIndexPath:tableView:)]) {
     CGFloat cellHeight = [cellClass heightForObject:object
                                         atIndexPath:indexPath tableView:tableView];
-    if (cellHeight > 0) {
+    if (cellHeight > 0 || cellHeight == UITableViewAutomaticDimension) {
       height = cellHeight;
     }
   }
